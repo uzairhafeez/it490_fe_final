@@ -46,6 +46,8 @@
       </nav>
       
 
+
+
       <section id="addDrug">
 
       Drug Name: <br>
@@ -76,40 +78,18 @@ $client = new rabbitMQClient("testRabbitMQ.ini","testServer");
 $request = array();
 
 $request['type'] = "getUserDrugs";
-
 $request['id'] = "$id";
 
 $response = $client->send_request($request);
-
-//$response = $client->publish($request);
-//echo "client received response: ".PHP_EOL;
-//print_r($response);
-//echo $argv[0]." END".PHP_EOL;
-
-
-//if ($response->num_rows > 0)
-//{
-
-//	while($row = $response-->fetch_assoc())
-//	{
-
-	$genName = $response['genericName'];
-	$proDesc = $response['productDesc'];
-	$recDate = $response['recallReportDate'];
-	$reason  = $response['reason'];
-	$brdName = $response['brandName'];
-	$status  = $response['status'];
-	$ref = $response['refLink'];
-	/*$id = $response['drugId'];
-	$count = 1;
-	while($count < count($id)){
-		echo $id["$count"];
-		$id ++;*/
+$data = json_decode($response, true);
+$arrayNumber = 0;
 
 ?>
 
+<br><br><br>
+
 <TABLE style="width:100%" border="1" bordercolor="blue">
-        <TR><CAPTION> Requested Drug Info </CAPTION></TR>
+        <TR><CAPTION> Requested Drug Info 22</CAPTION></TR>
         <TR>
                 <TD>Genetic Name</TD>
                 <TD>Product Description</TD>
@@ -120,23 +100,115 @@ $response = $client->send_request($request);
                 <TD>Reference</TD>
         </TR>
 
-        <TR>
-                <TD><?=$genName?></TD>
-                <TD><?=$proDesc?></TD>
-                <TD><?=$recDate?></TD>
-                <TD><?=$reason?></TD>
-                <TD><?=$brdName?></TD>
-                <TD><?=$status?></TD>
-                <TD><?=$ref?></TD>
-        </TR>
+       
+<?php
+//foreach ($data as $item)
+//{
+//	echo "<TR>";
+//	foreach($item as $d)
+//	{
+//		echo "<TD>".$d."</TD>";
+//	}
+//	echo "</TR>";
+//}
+?>
+
+
+
+
+	 <?php foreach($data[$arrayNumber] as $arrayData): ?>
+<TR>
+        <TD><?php echo $data[$arrayNumber]['genericName']; ?></TD>
+        <TD><?php echo $data[$arrayNumber]['productDesc']; ?></TD>
+        <TD><?php echo $data[$arrayNumber]['recallReportDate']; ?></TD>
+        <TD><?php echo $data[$arrayNumber]['reason']; ?></TD>
+        <TD><?php echo $data[$arrayNumber]['brandName']; ?></TD>
+        <TD><?php echo $data[$arrayNumber]['status']; ?></TD>
+
+        <TD><a href="<?php echo $data[$arrayNumber]['refLink']?>"><?php echo $data[$arrayNumber]['refLink']; ?></a></TD>
+</TR><br><br>
+                        <?php
+                                $arrayNumber++;
+                                endforeach; ?>
+
+ 
 
 </TABLE>
 
       </section>
 
+
       
+<!-- </div> @end #content
+</div> @end #w 
+-->
+
+
+<section id="notification" class="hidden">
+
+<p>List of your drugs.</p>
+
+<!-- <p class="myDrug">@10:15PM - Submitted a news article</p> -->
+
+<?php
+
+require_once('path.inc');
+require_once('get_host_info.inc');
+require_once('rabbitMQLib.inc');
+
+
+$client = new rabbitMQClient("testRabbitMQ.ini","testServer");
+
+$request = array();
+
+$request['type'] = "getUserNotifications";
+
+$request['id'] = "$id";
+
+$response = $client->send_request($request);
+
+$data = json_decode($response, true);
+$arrayNumber = 0;
+
+?>
+
+<TABLE style="width:100%" border="1" bordercolor="blue">
+
+<TR>
+        <TD>Genetic Name</TD>
+        <TD>Product Description</TD>
+        <TD>Recall Date</TD>
+        <TD>Reason</TD>
+        <TD>Brand Name</TD>
+        <TD>Status</TD>
+        <TD>Reference</TD>
+</TR>
+	<?php foreach($data[$arrayNumber] as $arrayData): ?>
+<TR>
+	<TD><?php echo $data[$arrayNumber]['genericName']; ?></TD>
+	<TD><?php echo $data[$arrayNumber]['productDesc']; ?></TD>
+	<TD><?php echo $data[$arrayNumber]['recallReportDate']; ?></TD>
+	<TD><?php echo $data[$arrayNumber]['reason']; ?></TD>
+	<TD><?php echo $data[$arrayNumber]['brandName']; ?></TD>
+	<TD><?php echo $data[$arrayNumber]['status']; ?></TD>
+
+	<TD><a href="<?php echo $data[$arrayNumber]['refLink']?>"><?php echo $data[$arrayNumber]['refLink']; ?></a></TD>
+</TR><br><br>
+			<?php
+				$arrayNumber++;
+				endforeach; ?>
+</TABLE>
+  </section>
+
+
     </div><!-- @end #content -->
   </div><!-- @end #w -->
+
+
+
+
+
+
 
 <script type="text/javascript">
 $(function(){
@@ -155,6 +227,11 @@ $(function(){
   });
 });
 </script>
+
+
+
+
+
 
 <script type="text/javascript">
 $(function(){
@@ -175,6 +252,12 @@ $('#addUserDrug').click(function(){
     });
 });
 </script>
+
+
+
+
+
+
 
 </body>
 </html>
